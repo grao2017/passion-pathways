@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Vapi from '@vapi-ai/web';
 
-const publicKey = process.env.VITE_VAPI_PUBLIC_KEY || ''; 
-const assistantId = process.env.VITE_VAPI_ASSISTANT_ID || '';
+const publicKey = import.meta.env.VITE_VAPI_PUBLIC_KEY || ''; 
+const assistantId = import.meta.env.VITE_VAPI_ASSISTANT_ID || '';
 
 const useVapi = () => {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -11,9 +11,8 @@ const useVapi = () => {
 
   useEffect(() => {
     if (!vapiRef.current) {
-      vapiRef.current = new Vapi(publicKey);
-      // Initialize with both keys since setAssistantId is not available
-      vapiRef.current = new Vapi(publicKey, { assistantId });
+      // Initialize Vapi with both keys
+      vapiRef.current = new Vapi(publicKey, assistantId);
     }
 
     return () => {
