@@ -1,7 +1,9 @@
-import { ArrowLeft, Shield, Video, CheckCircle } from "lucide-react";
+import { ArrowLeft, Shield, Video, CheckCircle, Mic, MicOff } from "lucide-react";
 import { Button } from "../ui/button";
 import { Tables } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
+import useVapi from "@/hooks/useVapi";
+import { AudioVisualizer } from "../AudioVisualizer";
 
 type Profile = Tables<"profiles">;
 
@@ -11,6 +13,8 @@ interface ChatHeaderProps {
 }
 
 export const ChatHeader = ({ profile, onBack }: ChatHeaderProps) => {
+  const { isSessionActive, toggleCall, volumeLevel } = useVapi();
+
   return (
     <div className="flex items-center gap-4 p-4 border-b bg-white sticky top-0 z-10 animate-fade-down">
       <Button 
@@ -40,6 +44,26 @@ export const ChatHeader = ({ profile, onBack }: ChatHeaderProps) => {
       </div>
       
       <div className="flex gap-2 animate-fade-in">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={toggleCall}
+          className={cn(
+            "hover:bg-gray-100 transition-colors duration-200",
+            "focus-visible:ring-2 focus-visible:ring-primary",
+            isSessionActive && "bg-primary/10"
+          )}
+          aria-label={isSessionActive ? "End voice call" : "Start voice call"}
+        >
+          {isSessionActive ? (
+            <div className="relative">
+              <MicOff className="h-5 w-5 text-blue-500" />
+              <AudioVisualizer volumeLevel={volumeLevel} isSessionActive={isSessionActive} />
+            </div>
+          ) : (
+            <Mic className="h-5 w-5 text-blue-500" />
+          )}
+        </Button>
         <Button 
           variant="ghost" 
           size="icon" 
