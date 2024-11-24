@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import Vapi from '@vapi-ai/web';
+import Vapi, { VapiEventNames } from '@vapi-ai/web';
 
-const publicKey = process.env.VITE_VAPI_PUBLIC_KEY || ''; // Replace with your actual public key
-const assistantId = process.env.VITE_VAPI_ASSISTANT_ID || ''; // Replace with your actual assistant ID
+const publicKey = process.env.VITE_VAPI_PUBLIC_KEY || ''; 
+const assistantId = process.env.VITE_VAPI_ASSISTANT_ID || '';
 
 const useVapi = () => {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -11,10 +11,8 @@ const useVapi = () => {
 
   useEffect(() => {
     if (!vapiRef.current) {
-      vapiRef.current = new Vapi({
-        publicKey,
-        assistantId,
-      });
+      vapiRef.current = new Vapi(publicKey);
+      vapiRef.current.setAssistantId(assistantId);
     }
 
     return () => {
@@ -36,9 +34,9 @@ const useVapi = () => {
         setIsSessionActive(true);
 
         // Set up audio analysis
-        vapiRef.current.on('audio', (audio) => {
+        vapiRef.current.on('userMedia' as VapiEventNames, (audio: Float32Array) => {
           const volume = Math.max(...Array.from(audio));
-          setVolumeLevel(volume);
+          setVolumeLevel(Number(volume));
         });
       }
     } catch (error) {
