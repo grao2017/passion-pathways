@@ -11,7 +11,6 @@ const useVapi = () => {
 
   useEffect(() => {
     if (!vapiRef.current) {
-      // Initialize Vapi with both keys
       vapiRef.current = new Vapi(publicKey, assistantId);
     }
 
@@ -34,7 +33,7 @@ const useVapi = () => {
         setIsSessionActive(true);
 
         // Set up audio analysis using the correct event type
-        vapiRef.current.on('audio', (audio: Float32Array) => {
+        vapiRef.current.on('userMedia' as any, (audio: Float32Array) => {
           const volume = Math.max(...Array.from(audio));
           setVolumeLevel(Number(volume));
         });

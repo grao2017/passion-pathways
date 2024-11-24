@@ -107,8 +107,8 @@ export const Messages = () => {
       const { data: newChat, error: chatError } = await supabase
         .from("chats")
         .insert({
-          profile_id_1: Math.min(myProfileId, profile.id),
-          profile_id_2: Math.max(myProfileId, profile.id),
+          profile_id_1: myProfileId,
+          profile_id_2: profile.id,
         })
         .select()
         .single();
