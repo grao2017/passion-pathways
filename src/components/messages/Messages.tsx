@@ -91,31 +91,37 @@ export const Messages = () => {
         throw new Error("User profile not found");
       }
 
-      // Query using the LEAST/GREATEST pattern to match the unique constraint
-      const { data: existingChat, error: existingChatError } = await supabase
+      // First try to find an existing chat
+      const { data: existingChat } = await supabase
         .from("chats")
         .select("*")
         .or(`and(profile_id_1.eq.${myProfileId},profile_id_2.eq.${profile.id}),and(profile_id_1.eq.${profile.id},profile_id_2.eq.${myProfileId})`)
-        .maybeSingle();
-
-      if (existingChatError) throw existingChatError;
+        .single();
 
       if (existingChat) {
         setSelectedChat({ chatId: existingChat.id, profile });
         return;
       }
 
-      // Create new chat with ordered profile IDs to match the unique constraint
+      // If no existing chat, create a new one with ordered profile IDs
       const { data: newChat, error: chatError } = await supabase
         .from("chats")
         .insert({
-          profile_id_1: myProfileId < profile.id ? myProfileId : profile.id,
-          profile_id_2: myProfileId < profile.id ? profile.id : myProfileId,
+          profile_id_1: Math.min(myProfileId, profile.id),
+          profile_id_2: Math.max(myProfileId, profile.id),
         })
         .select()
         .single();
 
-      if (chatError) throw chatError;
+      if (chatError) {
+        console.error("Error creating chat:", chatError);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to create chat. Please try again.",
+        });
+        return;
+      }
 
       if (newChat) {
         setSelectedChat({ chatId: newChat.id, profile });

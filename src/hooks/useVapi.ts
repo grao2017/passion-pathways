@@ -33,8 +33,8 @@ const useVapi = () => {
         await vapiRef.current.start();
         setIsSessionActive(true);
 
-        // Set up audio analysis
-        vapiRef.current.on('userMedia', (audio: Float32Array) => {
+        // Set up audio analysis using the correct event type
+        vapiRef.current.on('audio', (audio: Float32Array) => {
           const volume = Math.max(...Array.from(audio));
           setVolumeLevel(Number(volume));
         });
